@@ -1,0 +1,17 @@
+// Constants and mutable variables from the Lynx specification.
+const a = 10;
+const typedConstant: Number = 10;
+
+var b = 10;
+var typedVariable: Number = 10;
+
+typedVariable = typedVariable + 1;
+
+const greeting: String = "Hello, Lynx!";
+const message = greeting + " " + "compiler";
+
+var dynamic: Any = 10;
+dynamic = "now a string";
+
+var pending: Unknown = 10;
+const stillUnknown: Unknown = pending;

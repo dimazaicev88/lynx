@@ -1,0 +1,12 @@
+// Arrays keep their element type internally, so indexing stays checked.
+const numbers = [1, 2, 3];
+const first = numbers[0];
+const last = numbers[numbers.length - 1];
+const count = numbers.length;
+
+const nested = [[1, 2], [3, 4]];
+const nestedValue = nested[0][1];
+
+// An explicit Array annotation behaves like Array<Any>.
+var mixed: Array = [1, "two", 3];
+mixed = ["three", 4];
