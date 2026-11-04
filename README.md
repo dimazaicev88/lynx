@@ -18,6 +18,7 @@ JavaScript. Компилятор `lynxc` написан на Go: он разби
 - [Управляющие конструкции](#управляющие-конструкции)
 - [Функции](#функции)
 - [Лямбды и функциональные типы](#лямбды-и-функциональные-типы)
+- [ООП](#ооп)
 - [Диагностика ошибок](#диагностика-ошибок)
 - [Примеры и разработка](#примеры-и-разработка)
 
@@ -56,16 +57,17 @@ fun makeGreeting(name: String = "Lynx"): String {
   return "Hello, " + name + "!"
 }
 
-const greeting = makeGreeting()
-const customGreeting = makeGreeting(name = "world")
+val greeting = makeGreeting()
+val customGreeting = makeGreeting(name = "world")
 ```
 
 Сгенерированный JavaScript:
 
 ```js
 function makeGreeting(name = "Lynx") {
-  return "Hello, " + name + "!";
+    return "Hello, " + name + "!";
 }
+
 const greeting = makeGreeting();
 const customGreeting = makeGreeting("world");
 ```
@@ -78,7 +80,7 @@ const customGreeting = makeGreeting("world");
 
 - типы `Number`, `String`, `Array`, `Any`, `Unknown`, `Null` и nullable-типы
   `T?`;
-- константы `const` (также `val`) и изменяемые переменные `var`;
+- неизменяемые значения `val` и изменяемые переменные `var`;
 - вывод типов по начальному значению;
 - именованные функции, значения параметров по умолчанию и вариадические
   параметры;
@@ -98,11 +100,11 @@ nullable-типов также отсутствуют.
 lynxc [опции] <файл.lynx>
 ```
 
-| Опция | Назначение |
-| --- | --- |
-| `-o <файл>` | записать JavaScript в файл вместо stdout |
-| `-check` | только проверить программу, не генерировать JavaScript |
-| `-version` | вывести версию компилятора |
+| Опция       | Назначение                                             |
+|-------------|--------------------------------------------------------|
+| `-o <файл>` | записать JavaScript в файл вместо stdout               |
+| `-check`    | только проверить программу, не генерировать JavaScript |
+| `-version`  | вывести версию компилятора                             |
 
 Опции можно располагать до или после имени исходного файла:
 
@@ -124,9 +126,9 @@ lynxc [опции] <файл.lynx>
 Точки с запятой необязательны:
 
 ```lynx
-const first = 1
-const second = 2;
-const third = first + second
+val first = 1
+val second = 2;
+val third = first + second
 ```
 
 Перевод строки не завершает инструкцию. Поэтому пустой `return` перед другим
@@ -154,11 +156,11 @@ fun noop() {
 
 ## Переменные и области видимости
 
-Константа объявляется через `const` или его синоним `val` и обязана иметь
+Неизменяемая переменная объявляется через `val` и обязана иметь
 начальное значение:
 
 ```lynx
-const answer = 42
+val answer = 42
 val language: String = "Lynx"
 ```
 
@@ -175,8 +177,8 @@ total = 20
 Общие формы объявления:
 
 ```text
-const имя = выражение
-const имя: Тип = выражение
+val имя = выражение
+val имя: Тип = выражение
 var имя = выражение
 var имя: Тип = выражение
 var имя: Тип
@@ -198,34 +200,33 @@ pending = 5
 
 - если аннотация отсутствует, тип выводится из начального значения;
 - тип `var` фиксируется при объявлении;
-- повторное присваивание `const` и `val` запрещено;
+- повторное присваивание `val` запрещено;
 - повторное объявление имени в одной области видимости запрещено;
 - внутренний блок может обращаться к именам внешней области;
 - имя переменной не должно конфликтовать с именем функции.
 
-При генерации `const` и `val` преобразуются в JavaScript `const`, а `var` — в
-`let`.
+При генерации `val` преобразуется в JavaScript `const`, а `var` — в `let`.
 
 ## Типы
 
-| Тип | Описание |
-| --- | --- |
-| `Number` | число; `Int` является синонимом `Number` |
-| `String` | строка |
-| `Array` | массив; в аннотации эквивалентен `Array<Any>` |
-| `Any` | динамическое значение; статические проверки для него ослаблены |
-| `Unknown` | значение неизвестного типа |
-| `Null` | тип литерала `null` |
-| `T?` | значение типа `T` или `null` |
-| `(T1, T2) -> R` | функция с типами параметров `T1`, `T2` и результатом `R` |
+| Тип             | Описание                                                       |
+|-----------------|----------------------------------------------------------------|
+| `Number`        | число; `Int` является синонимом `Number`                       |
+| `String`        | строка                                                         |
+| `Array`         | массив; в аннотации эквивалентен `Array<Any>`                  |
+| `Any`           | динамическое значение; статические проверки для него ослаблены |
+| `Unknown`       | значение неизвестного типа                                     |
+| `Null`          | тип литерала `null`                                            |
+| `T?`            | значение типа `T` или `null`                                   |
+| `(T1, T2) -> R` | функция с типами параметров `T1`, `T2` и результатом `R`       |
 
 Примеры аннотаций:
 
 ```lynx
-const count: Number = 10
+val count: Number = 10
 var name: String = "Lynx"
-const items: Array = [1, 2, 3]
-const missing: Null = null
+val items: Array = [1, 2, 3]
+val missing: Null = null
 var nickname: String? = null
 ```
 
@@ -251,10 +252,10 @@ var nickname: String? = null
 Массивы создаются литералами:
 
 ```lynx
-const numbers = [1, 2, 3]
-const first: Number = numbers[0]
-const size: Number = numbers.length
-const empty = []
+val numbers = [1, 2, 3]
+val first: Number = numbers[0]
+val size: Number = numbers.length
+val empty = []
 ```
 
 Компилятор сохраняет тип элементов для проверки индексации:
@@ -282,7 +283,7 @@ const empty = []
 Скобки изменяют порядок вычисления:
 
 ```lynx
-const result = -(1 + 2) * 3
+val result = -(1 + 2) * 3
 ```
 
 Операторы `-`, `*`, `/`, `%` работают с числами. Оператор `+` складывает числа
@@ -290,15 +291,15 @@ const result = -(1 + 2) * 3
 числом:
 
 ```lynx
-const message = "Result: " + 42
+val message = "Result: " + 42
 ```
 
 Индексация и `.length` доступны как для массивов, так и для строк:
 
 ```lynx
-const word = "Lynx"
-const firstCharacter = word[0]
-const length = word.length
+val word = "Lynx"
+val firstCharacter = word[0]
+val length = word.length
 ```
 
 Операторы сравнения и логические операторы пока не поддерживаются.
@@ -398,8 +399,8 @@ fun log(value: Number) {
   return
 }
 
-const two = add(1)
-const five = add(a = 2, b = 3)
+val two = add(1)
+val five = add(a = 2, b = 3)
 ```
 
 ### Параметры и аргументы
@@ -437,7 +438,7 @@ fun f(a: Number = 1, b: Number = 2): Number {
   return b
 }
 
-const result = f(b = 5) // JavaScript: f(undefined, 5)
+val result = f(b = 5) // JavaScript: f(1, 5)
 ```
 
 Вариадический параметр записывается через `...` после типа:
@@ -447,7 +448,7 @@ fun first(numbers: Number...): Number {
   return numbers[0]
 }
 
-const value = first(1, 2, 3, 4)
+val value = first(1, 2, 3, 4)
 ```
 
 Он должен быть последним и единственным вариадическим параметром функции, не
@@ -476,11 +477,11 @@ rest-параметр `...numbers`.
 выражение, результат которого возвращается:
 
 ```lynx
-const sum = { x: Number, y: Number ->
+val sum = { x: Number, y: Number ->
   x + y
 }
 
-const total = sum(1, 5)
+val total = sum(1, 5)
 ```
 
 Результат транспиляции:
@@ -493,7 +494,7 @@ const total = sum(1, 5);
 Тип лямбды выводится автоматически. Его также можно указать явно:
 
 ```lynx
-const sum: (Number, Number) -> Number = {
+val sum: (Number, Number) -> Number = {
   x: Number, y: Number -> x + y
 }
 ```
@@ -505,16 +506,16 @@ fun apply(f: (Number) -> Number, value: Number): Number {
   return f(value)
 }
 
-const incremented = apply({ n: Number -> n + 1 }, 10)
+val incremented = apply({ n: Number -> n + 1 }, 10)
 ```
 
 Лямбда без параметров записывается как `{ -> 42 }`. Лямбды поддерживают
 замыкания:
 
 ```lynx
-const outer = { x: Number -> { y: Number -> x + y } }
-const addOne = outer(1)
-const result = addOne(41) // 42
+val outer = { x: Number -> { y: Number -> x + y } }
+val addOne = outer(1)
+val result = addOne(41) // 42
 ```
 
 Текущие ограничения:
@@ -528,15 +529,177 @@ const result = addOne(41) // 42
 - вызывать можно только имя функции или переменной: вызов произвольного
   выражения, например `functions[0](1)`, пока недоступен.
 
+## ООП
+
+> `class` и `interface` описаны как планируемые возможности. Их поведение должно
+> соответствовать Kotlin, но текущая версия компилятора их ещё не поддерживает.
+
+### Классы
+
+Класс объявляется через `class`. Конструктор записывается в заголовке
+класса; его параметры, помеченные `val` или `var`, становятся свойствами:
+
+```lynx
+class User(val name: String, var age: Number = 0) {
+  fun greet(): String {
+    return "Hello, " + name + "!"
+  }
+}
+
+val user = User("Lynx", 3)
+val renamed = User(name = "world")
+```
+
+Результат транспиляции:
+
+```js
+class User {
+    constructor(name, age = 0) {
+        this.name = name;
+        this.age = age;
+    }
+
+    greet() {
+        return "Hello, " + this.name + "!";
+    }
+}
+
+const user = new User("Lynx", 3);
+```
+
+Свойство объявляется через `val` (только чтение) или `var` (изменяемое). Его
+можно описать и в теле класса:
+
+```lynx
+class Counter(val start: Number = 0) {
+  var count: Number = start
+
+  fun increment(): Number {
+    count = count + 1
+    return count
+  }
+}
+
+val counter = Counter()
+val next = counter.increment()
+```
+
+Объект создаётся вызовом `ИмяКласса(аргументы)`, без `new`. Значения по
+умолчанию, позиционные и именованные аргументы работают так же, как у функций.
+Доступ к членам — через точку:
+
+```lynx
+val user = User("Lynx")
+val greeting = user.greet()
+user.age = 4
+```
+
+#### Наследование
+
+Родительский класс указывается после двоеточия вместе с аргументами
+своего конструктора:
+
+```lynx
+class Animal(val name: String) {
+  fun speak(): String {
+    return "..."
+  }
+}
+
+class Dog(val name: String): Animal(name) {
+  override fun speak(): String {
+    return "Woof"
+  }
+}
+
+class QuietDog(val name: String): Dog(name) {
+  override fun speak(): String {
+    return "[" + super.speak() + "]"
+  }
+}
+```
+
+Переопределение
+помечается `override`; реализация родителя доступна через `super`.
+
+#### Абстрактные классы
+
+Абстрактный класс объявляется через `abstract class` и не может быть создан
+напрямую. Абстрактный метод не имеет тела и обязан быть переопределён:
+
+```lynx
+abstract class Shape {
+  abstract fun area(): Number
+
+  fun describe(): String {
+    return "area = " + area()
+  }
+}
+
+class Square(val side: Number): Shape {
+  override fun area(): Number {
+    return side * side
+  }
+}
+```
+
+Правила:
+
+- классы объявляются на верхнем уровне программы, как именованные функции;
+- класс наследует не более одного класса; интерфейсы перечисляются после
+  родителя через запятую;
+- члены класса публичны; модификаторы доступа (`private`, `protected`,
+  `public`) появятся позже;
+
+### Интерфейсы
+
+Интерфейс задаёт контракт без состояния. Метод без тела — абстрактный; метод с
+телом даёт реализацию по умолчанию. Свойства объявляются без начального
+значения:
+
+```lynx
+interface Named {
+  val name: String
+
+  fun describe(): String {
+    return "named " + name
+  }
+}
+
+interface Serializable {
+  fun serialize(): String
+}
+
+class User(val name: String, val age: Number): Named, Serializable {
+  override fun serialize(): String {
+    return name + " (" + age + ")"
+  }
+}
+
+val user = User("Lynx", 3)
+val description = user.describe() // "named Lynx" — реализация по умолчанию
+```
+
+Правила:
+
+- методы с телом можно не переопределять; методы без тела класс обязан
+  реализовать, переопределение помечается `override`;
+- свойства интерфейса не хранят значения — их предоставляет класс;
+- если два интерфейса дают реализацию одного и того же метода, класс должен
+  переопределить его сам;
+- интерфейсы существуют только во время компиляции: в JavaScript они не
+  попадают, а реализация по умолчанию подставляется в классы, которые её не
+  переопределили.
+
 ## Диагностика ошибок
 
 Компилятор сообщает имя файла, строку, столбец и показывает фрагмент исходника:
 
 ```text
 $ ./bin/lynxc bad.lynx
-bad.lynx:1:19: error: cannot assign a value of type String to variable "a" of type Number
-const a: Number = "x";
-                  ^
+bad.lynx:1:17: error: cannot assign a value of type String to variable "a" of type Number
+val a: Number = "x";
+                ^
 ```
 
 Одна компиляция может вывести несколько независимых ошибок проверки типов.
@@ -547,12 +710,12 @@ JavaScript не генерируется, если программа содер
 В каталоге `examples/` находятся программы, которые можно использовать как
 дополнительные примеры:
 
-| Файл | Содержимое |
-| --- | --- |
-| `examples/basic.lynx` | переменные, типы и строковая конкатенация |
-| `examples/arrays.lynx` | массивы, вложенная индексация и `.length` |
+| Файл                      | Содержимое                                   |
+|---------------------------|----------------------------------------------|
+| `examples/basic.lynx`     | переменные, типы и строковая конкатенация    |
+| `examples/arrays.lynx`    | массивы, вложенная индексация и `.length`    |
 | `examples/functions.lynx` | функции, аргументы и вариадические параметры |
-| `examples/lambdas.lynx` | лямбды, функциональные типы и замыкания |
+| `examples/lambdas.lynx`   | лямбды, функциональные типы и замыкания      |
 
 Перед отправкой изменений в компилятор выполните:
 
