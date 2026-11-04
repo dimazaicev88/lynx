@@ -4,37 +4,10 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9ed931df-5712-44d5-9e67-47361615ec04" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/go.imports.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/lang.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Makefile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/cmd/lynxc/main.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/cmd/lynxc/main_test.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/examples/arrays.lynx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/examples/basic.lynx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/ast/ast.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/checker/checker.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/checker/checker_test.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/codegen/codegen.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/codegen/codegen_test.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/compiler/compiler.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/compiler/compiler_test.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/diag/diag.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/diag/diag_test.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/lexer/lexer.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/lexer/lexer_test.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/parser/parser.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/parser/parser_test.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/token/token.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/task.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tsconfig.json" afterDir="false" />
+    <list default="true" id="9ed931df-5712-44d5-9e67-47361615ec04" name="Changes" comment="fix changes">
+      <change afterPath="$PROJECT_DIR$/tmp.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,6 +19,65 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GoLinterSelectedExecutable" path="$USER_HOME$/golangci-lint/golangci-lint" />
+  <component name="NextEditCompletionFeaturesState">
+    <decayedCancelled>
+      <entry key="MS100" value="1.2116863280906318" />
+      <entry key="MS500" value="1.7330583785946045" />
+      <entry key="S2" value="1.9253044567977111" />
+      <entry key="S5" value="1.970422060423839" />
+      <entry key="S10" value="2.0240589077944007" />
+      <entry key="S30" value="2.7114446729572355" />
+      <entry key="S60" value="3.9683296302596767" />
+      <entry key="M2" value="6.438539044120722" />
+      <entry key="M5" value="13.2859718009562" />
+      <entry key="M10" value="21.271458454266586" />
+      <entry key="M15" value="26.24837691769368" />
+      <entry key="M30" value="33.614680490635855" />
+      <entry key="H1" value="38.660912968211235" />
+      <entry key="H2" value="41.645704185698044" />
+      <entry key="H4" value="43.27336629772751" />
+      <entry key="D1" value="44.70505348707002" />
+      <entry key="W1" value="44.95768500804454" />
+    </decayedCancelled>
+    <decayedSelected>
+      <entry key="MS100" value="1.4371402790824005E-178" />
+      <entry key="MS500" value="2.7008460655758938E-36" />
+      <entry key="S2" value="1.2819614276204538E-9" />
+      <entry key="S5" value="2.7742954273643407E-4" />
+      <entry key="S10" value="0.01669786970821819" />
+      <entry key="S30" value="0.29016310606794776" />
+      <entry key="S60" value="0.7016488020805031" />
+      <entry key="M2" value="1.2432839500937838" />
+      <entry key="M5" value="2.0337036291570354" />
+      <entry key="M10" value="2.6300666384946916" />
+      <entry key="M15" value="2.949216300232217" />
+      <entry key="M30" value="3.384002529821119" />
+      <entry key="H1" value="3.6638771479681824" />
+      <entry key="H2" value="3.8240671662332417" />
+      <entry key="H4" value="3.9099489823278692" />
+      <entry key="D1" value="3.984691460950117" />
+      <entry key="W1" value="3.997805576768937" />
+    </decayedSelected>
+    <decayedShown>
+      <entry key="MS100" value="1.0608893734774227" />
+      <entry key="MS500" value="1.6870171272253114" />
+      <entry key="S2" value="1.9123496310556705" />
+      <entry key="S5" value="1.965012154380586" />
+      <entry key="S10" value="2.0300029952551926" />
+      <entry key="S30" value="2.9649978079862853" />
+      <entry key="S60" value="4.633988935565036" />
+      <entry key="M2" value="7.654662470245224" />
+      <entry key="M5" value="15.30233218042712" />
+      <entry key="M10" value="23.888170535588518" />
+      <entry key="M15" value="29.186413831247922" />
+      <entry key="M30" value="36.99128622761023" />
+      <entry key="H1" value="42.32044949619856" />
+      <entry key="H2" value="45.46740860045266" />
+      <entry key="H4" value="47.182081166085325" />
+      <entry key="D1" value="48.68953151086135" />
+      <entry key="W1" value="48.955459898149684" />
+    </decayedShown>
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 0,
   &quot;fromUser&quot;: false
@@ -92,8 +124,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-gosdk-63c95d513abe-08e7ff217c2b-org.jetbrains.plugins.go.sharedIndexes.bundled-GO-262.10968.67" />
-        <option value="bundled-js-predefined-d6986cc7102b-4abd2a77f808-JavaScript-GO-262.10968.67" />
+        <option value="bundled-gosdk-63c95d513abe-08e7ff217c2b-org.jetbrains.plugins.go.sharedIndexes.bundled-GO-262.11879.101" />
+        <option value="bundled-js-predefined-d6986cc7102b-4abd2a77f808-JavaScript-GO-262.11879.101" />
       </set>
     </attachedChunks>
   </component>
@@ -104,11 +136,25 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1793281548866</updated>
-      <workItem from="1793281549973" duration="3225000" />
+      <workItem from="1793281549973" duration="5135000" />
+      <workItem from="1793357260362" duration="605000" />
     </task>
+    <task id="LOCAL-00001" summary="fix changes">
+      <option name="closed" value="true" />
+      <created>1793284878831</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1793284878831</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="fix changes" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix changes" />
   </component>
 </project>
