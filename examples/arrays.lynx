@@ -11,5 +11,5 @@ if firstRow != null {
 }
 
 // An explicit Array annotation behaves like Array<Any>.
-var mixed: Array = [1, "two", 3];
+var mixed: [Any] = [1, "two", 3];
 mixed = ["three", 4];

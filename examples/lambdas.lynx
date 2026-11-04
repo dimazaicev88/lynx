@@ -9,7 +9,7 @@ val sum = { x: Int, y: Int ->
 
 const total = log(sum(1, 5))
 
-fun apply(f: (Number) -> Number, value: Number): Number {
+fun apply(f: (Number) -> Number throws {SomeError}, value: Number): Number {
   return f(value)
 }
 

@@ -5,9 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9ed931df-5712-44d5-9e67-47361615ec04" name="Changes" comment="fix changes">
-      <change afterPath="$PROJECT_DIR$/tmp.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/arrays.lynx" beforeDir="false" afterPath="$PROJECT_DIR$/examples/arrays.lynx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/control.lynx" beforeDir="false" afterPath="$PROJECT_DIR$/examples/control.lynx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/functions.lynx" beforeDir="false" afterPath="$PROJECT_DIR$/examples/functions.lynx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/lambdas.lynx" beforeDir="false" afterPath="$PROJECT_DIR$/examples/lambdas.lynx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -18,64 +20,76 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;dimazaicev88&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/dimazaicev88/lang.git&quot;,
+    &quot;accountId&quot;: &quot;a86f9f62-8af6-4b06-8e04-56cb0b6a80bc&quot;
+  }
+}</component>
   <component name="GoLinterSelectedExecutable" path="$USER_HOME$/golangci-lint/golangci-lint" />
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.2116863280906318" />
-      <entry key="MS500" value="1.7330583785946045" />
-      <entry key="S2" value="1.9253044567977111" />
-      <entry key="S5" value="1.970422060423839" />
-      <entry key="S10" value="2.0240589077944007" />
-      <entry key="S30" value="2.7114446729572355" />
-      <entry key="S60" value="3.9683296302596767" />
-      <entry key="M2" value="6.438539044120722" />
-      <entry key="M5" value="13.2859718009562" />
-      <entry key="M10" value="21.271458454266586" />
-      <entry key="M15" value="26.24837691769368" />
-      <entry key="M30" value="33.614680490635855" />
-      <entry key="H1" value="38.660912968211235" />
-      <entry key="H2" value="41.645704185698044" />
-      <entry key="H4" value="43.27336629772751" />
-      <entry key="D1" value="44.70505348707002" />
-      <entry key="W1" value="44.95768500804454" />
+      <entry key="MS100" value="1.0" />
+      <entry key="MS500" value="1.0" />
+      <entry key="S2" value="1.0" />
+      <entry key="S5" value="1.000000008512544" />
+      <entry key="S10" value="1.000177624161684" />
+      <entry key="S30" value="1.2378366289620595" />
+      <entry key="S60" value="2.618923104745365" />
+      <entry key="M2" value="5.346616207661442" />
+      <entry key="M5" value="9.18277758328564" />
+      <entry key="M10" value="13.620130660834961" />
+      <entry key="M15" value="18.366457620632847" />
+      <entry key="M30" value="29.564139887294964" />
+      <entry key="H1" value="42.478171265523436" />
+      <entry key="H2" value="58.709725918977966" />
+      <entry key="H4" value="77.42242888921903" />
+      <entry key="D1" value="108.00990128499609" />
+      <entry key="W1" value="115.63824832643579" />
     </decayedCancelled>
     <decayedSelected>
-      <entry key="MS100" value="1.4371402790824005E-178" />
-      <entry key="MS500" value="2.7008460655758938E-36" />
-      <entry key="S2" value="1.2819614276204538E-9" />
-      <entry key="S5" value="2.7742954273643407E-4" />
-      <entry key="S10" value="0.01669786970821819" />
-      <entry key="S30" value="0.29016310606794776" />
-      <entry key="S60" value="0.7016488020805031" />
-      <entry key="M2" value="1.2432839500937838" />
-      <entry key="M5" value="2.0337036291570354" />
-      <entry key="M10" value="2.6300666384946916" />
-      <entry key="M15" value="2.949216300232217" />
-      <entry key="M30" value="3.384002529821119" />
-      <entry key="H1" value="3.6638771479681824" />
-      <entry key="H2" value="3.8240671662332417" />
-      <entry key="H4" value="3.9099489823278692" />
-      <entry key="D1" value="3.984691460950117" />
-      <entry key="W1" value="3.997805576768937" />
+      <entry key="MS100" value="0.0" />
+      <entry key="MS500" value="0.0" />
+      <entry key="S2" value="1.1340455073208E-310" />
+      <entry key="S5" value="1.5635412345074893E-124" />
+      <entry key="S10" value="1.7624914807923675E-62" />
+      <entry key="S30" value="4.128000756415653E-21" />
+      <entry key="S60" value="9.085409450007946E-11" />
+      <entry key="M2" value="1.347960462540034E-5" />
+      <entry key="M5" value="0.017079943740197556" />
+      <entry key="M10" value="0.18482376525092853" />
+      <entry key="M15" value="0.4088051852589484" />
+      <entry key="M30" value="0.9063787832691266" />
+      <entry key="H1" value="1.4373913862387349" />
+      <entry key="H2" value="2.2479649314429233" />
+      <entry key="H4" value="3.370091261590026" />
+      <entry key="D1" value="5.385742260286232" />
+      <entry key="W1" value="5.906516823201347" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="1.0608893734774227" />
-      <entry key="MS500" value="1.6870171272253114" />
-      <entry key="S2" value="1.9123496310556705" />
-      <entry key="S5" value="1.965012154380586" />
-      <entry key="S10" value="2.0300029952551926" />
-      <entry key="S30" value="2.9649978079862853" />
-      <entry key="S60" value="4.633988935565036" />
-      <entry key="M2" value="7.654662470245224" />
-      <entry key="M5" value="15.30233218042712" />
-      <entry key="M10" value="23.888170535588518" />
-      <entry key="M15" value="29.186413831247922" />
-      <entry key="M30" value="36.99128622761023" />
-      <entry key="H1" value="42.32044949619856" />
-      <entry key="H2" value="45.46740860045266" />
-      <entry key="H4" value="47.182081166085325" />
-      <entry key="D1" value="48.68953151086135" />
-      <entry key="W1" value="48.955459898149684" />
+      <entry key="MS100" value="0.9265880618903709" />
+      <entry key="MS500" value="0.9848664428955506" />
+      <entry key="S2" value="0.9961949481330542" />
+      <entry key="S5" value="0.998476246807338" />
+      <entry key="S10" value="0.9994153067719209" />
+      <entry key="S30" value="1.2375005466193068" />
+      <entry key="S60" value="2.61836217640012" />
+      <entry key="M2" value="5.34573614025913" />
+      <entry key="M5" value="9.198965110561218" />
+      <entry key="M10" value="13.803935183659682" />
+      <entry key="M15" value="18.774148637273235" />
+      <entry key="M30" value="30.46944142056642" />
+      <entry key="H1" value="43.91454573785195" />
+      <entry key="H2" value="60.956626922191035" />
+      <entry key="H4" value="80.79157799680968" />
+      <entry key="D1" value="113.39536337370585" />
+      <entry key="W1" value="121.54472059010173" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -110,6 +124,11 @@
     &quot;ts.external.directory.path&quot;: &quot;/home/dima/projects/lang/node_modules/@typescript/typescript-linux-x64/lib&quot;
   }
 }</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+    </key>
+  </component>
   <component name="RunManager">
     <configuration name="go build lynx/cmd/lynxc" type="GoApplicationRunConfiguration" factoryName="Go Application" nameIsGenerated="true">
       <module name="lang" />

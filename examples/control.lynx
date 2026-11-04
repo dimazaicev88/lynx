@@ -16,7 +16,7 @@ fun describe(value: Unknown): String {
   return "not a string"
 }
 
-val values: Array<Number> = [10, 20, 30]
+val values: [Number] = [10, 20, 30]
 for var i = 0; i < values.length; i = i + 1 {
   val value = values[i]
   if value == null {

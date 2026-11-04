@@ -7,6 +7,10 @@ const named = formatName(name = "Lynx", prefix = "Hi");
 const positional = formatName("Lynx");
 const empty = formatName();
 
+fun openFile(path: String): File throw IoError {
+    return io.open(path)?
+}
+
 fun first(numbers: Number...): Number? {
   return numbers[0]
 }
