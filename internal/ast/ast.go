@@ -76,6 +76,65 @@ type ReturnStmt struct {
 func (s *ReturnStmt) Pos() token.Position { return s.Position }
 func (s *ReturnStmt) stmtNode()           {}
 
+// IfStmt conditionally executes one of two branches.
+type IfStmt struct {
+	Position token.Position
+	Cond     Expr
+	Then     *BlockStmt
+	Else     Stmt
+}
+
+func (s *IfStmt) Pos() token.Position { return s.Position }
+func (s *IfStmt) stmtNode()           {}
+
+// ForStmt is a condition-only, infinite or three-part loop.
+type ForStmt struct {
+	Position token.Position
+	Init     Stmt
+	Cond     Expr
+	Post     Stmt
+	Body     *BlockStmt
+}
+
+func (s *ForStmt) Pos() token.Position { return s.Position }
+func (s *ForStmt) stmtNode()           {}
+
+// BreakStmt exits the nearest loop or switch.
+type BreakStmt struct{ Position token.Position }
+
+func (s *BreakStmt) Pos() token.Position { return s.Position }
+func (s *BreakStmt) stmtNode()           {}
+
+// ContinueStmt starts the next iteration of the nearest loop.
+type ContinueStmt struct{ Position token.Position }
+
+func (s *ContinueStmt) Pos() token.Position { return s.Position }
+func (s *ContinueStmt) stmtNode()           {}
+
+// FallthroughStmt passes control to the next switch case.
+type FallthroughStmt struct{ Position token.Position }
+
+func (s *FallthroughStmt) Pos() token.Position { return s.Position }
+func (s *FallthroughStmt) stmtNode()           {}
+
+// SwitchStmt executes the first matching case.
+type SwitchStmt struct {
+	Position token.Position
+	Value    Expr
+	Cases    []*SwitchCase
+}
+
+func (s *SwitchStmt) Pos() token.Position { return s.Position }
+func (s *SwitchStmt) stmtNode()           {}
+
+// SwitchCase is a case or default clause.
+type SwitchCase struct {
+	Position  token.Position
+	Values    []Expr
+	IsDefault bool
+	Body      []Stmt
+}
+
 // Param is a function parameter.
 type Param struct {
 	Position token.Position
@@ -101,11 +160,12 @@ type FunctionDecl struct {
 func (d *FunctionDecl) Pos() token.Position { return d.Position }
 func (d *FunctionDecl) stmtNode()           {}
 
-// TypeExpr is a type annotation such as Number, Array, String? or
+// TypeExpr is a type annotation such as Number, Array<Number>, String? or
 // (Number, Number) -> Number.
 type TypeExpr struct {
 	Position token.Position
 	Name     string
+	Elem     *TypeExpr
 	Nullable bool
 	Function bool
 	Params   []*TypeExpr
@@ -233,3 +293,23 @@ type MemberExpr struct {
 
 func (e *MemberExpr) Pos() token.Position { return e.Position }
 func (e *MemberExpr) exprNode()           {}
+
+// BoolLit is true or false.
+type BoolLit struct {
+	Position token.Position
+	Value    bool
+}
+
+func (e *BoolLit) Pos() token.Position { return e.Position }
+func (e *BoolLit) exprNode()           {}
+
+// TypeTestExpr checks the runtime type of a value.
+type TypeTestExpr struct {
+	Position token.Position
+	X        Expr
+	Type     *TypeExpr
+	Negate   bool
+}
+
+func (e *TypeTestExpr) Pos() token.Position { return e.Position }
+func (e *TypeTestExpr) exprNode()           {}

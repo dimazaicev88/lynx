@@ -10,12 +10,16 @@ import (
 )
 
 const (
-	precLambda         = 1
-	precAdditive       = 2
-	precMultiplicative = 3
-	precUnary          = 4
-	precPostfix        = 5
-	precPrimary        = 6
+	precLambda = iota + 1
+	precOr
+	precAnd
+	precEquality
+	precComparison
+	precAdditive
+	precMultiplicative
+	precUnary
+	precPostfix
+	precPrimary
 )
 
 const indentUnit = "  "
@@ -49,22 +53,11 @@ func (g *generator) writeStmt(stmt ast.Stmt) {
 	switch s := stmt.(type) {
 	case *ast.VarDecl:
 		g.writeIndent()
-		if s.Const {
-			g.builder.WriteString("const ")
-		} else {
-			g.builder.WriteString("let ")
-		}
-		g.builder.WriteString(s.Name)
-		if s.Value != nil {
-			g.builder.WriteString(" = ")
-			g.writeExpr(s.Value)
-		}
+		g.writeVarDecl(s)
 		g.builder.WriteString(";\n")
 	case *ast.AssignStmt:
 		g.writeIndent()
-		g.builder.WriteString(s.Name)
-		g.builder.WriteString(" = ")
-		g.writeExpr(s.Value)
+		g.writeAssign(s)
 		g.builder.WriteString(";\n")
 	case *ast.ExprStmt:
 		g.writeIndent()
@@ -80,16 +73,164 @@ func (g *generator) writeStmt(stmt ast.Stmt) {
 		g.builder.WriteString(";\n")
 	case *ast.BlockStmt:
 		g.writeIndent()
-		g.builder.WriteString("{\n")
+		g.writeBlock(s)
+		g.builder.WriteByte('\n')
+	case *ast.IfStmt:
+		g.writeIndent()
+		g.writeIf(s)
+	case *ast.ForStmt:
+		g.writeIndent()
+		g.writeFor(s)
+	case *ast.SwitchStmt:
+		g.writeSwitch(s)
+	case *ast.BreakStmt:
+		g.writeIndent()
+		g.builder.WriteString("break;\n")
+	case *ast.ContinueStmt:
+		g.writeIndent()
+		g.builder.WriteString("continue;\n")
+	case *ast.FallthroughStmt:
+	case *ast.FunctionDecl:
+		g.writeFunction(s)
+	}
+}
+
+func (g *generator) writeVarDecl(decl *ast.VarDecl) {
+	if decl.Const {
+		g.builder.WriteString("const ")
+	} else {
+		g.builder.WriteString("let ")
+	}
+	g.builder.WriteString(decl.Name)
+	if decl.Value != nil {
+		g.builder.WriteString(" = ")
+		g.writeExpr(decl.Value)
+	}
+}
+
+func (g *generator) writeAssign(stmt *ast.AssignStmt) {
+	g.builder.WriteString(stmt.Name)
+	g.builder.WriteString(" = ")
+	g.writeExpr(stmt.Value)
+}
+
+func (g *generator) writeBlock(block *ast.BlockStmt) {
+	g.builder.WriteString("{\n")
+	g.indent++
+	for _, stmt := range block.Statements {
+		g.writeStmt(stmt)
+	}
+	g.indent--
+	g.writeIndent()
+	g.builder.WriteByte('}')
+}
+
+func (g *generator) writeIf(stmt *ast.IfStmt) {
+	g.builder.WriteString("if (")
+	g.writeExpr(stmt.Cond)
+	g.builder.WriteString(") ")
+	g.writeBlock(stmt.Then)
+	if stmt.Else == nil {
+		g.builder.WriteByte('\n')
+		return
+	}
+	g.builder.WriteString(" else ")
+	switch branch := stmt.Else.(type) {
+	case *ast.IfStmt:
+		g.writeIf(branch)
+	case *ast.BlockStmt:
+		g.writeBlock(branch)
+		g.builder.WriteByte('\n')
+	}
+}
+
+func (g *generator) writeFor(stmt *ast.ForStmt) {
+	if stmt.Init == nil && stmt.Cond == nil && stmt.Post == nil {
+		g.builder.WriteString("for (;;) ")
+		g.writeBlock(stmt.Body)
+		g.builder.WriteByte('\n')
+		return
+	}
+
+	g.builder.WriteString("for (")
+	if stmt.Init != nil {
+		switch init := stmt.Init.(type) {
+		case *ast.VarDecl:
+			g.writeVarDecl(init)
+		case *ast.AssignStmt:
+			g.writeAssign(init)
+		}
+	}
+	g.builder.WriteString("; ")
+	if stmt.Cond != nil {
+		g.writeExpr(stmt.Cond)
+	}
+	g.builder.WriteString("; ")
+	if stmt.Post != nil {
+		switch post := stmt.Post.(type) {
+		case *ast.AssignStmt:
+			g.writeAssign(post)
+		case *ast.ExprStmt:
+			g.writeExpr(post.X)
+		}
+	}
+	g.builder.WriteString(") ")
+	g.writeBlock(stmt.Body)
+	g.builder.WriteByte('\n')
+}
+
+func (g *generator) writeSwitch(stmt *ast.SwitchStmt) {
+	g.writeIndent()
+	g.builder.WriteString("switch (")
+	if stmt.Value != nil {
+		g.writeExpr(stmt.Value)
+	} else {
+		g.builder.WriteString("true")
+	}
+	g.builder.WriteString(") {\n")
+	g.indent++
+	for _, clause := range stmt.Cases {
+		if clause.IsDefault {
+			g.writeIndent()
+			g.builder.WriteString("default: {\n")
+		} else {
+			for j, value := range clause.Values {
+				g.writeIndent()
+				g.builder.WriteString("case ")
+				g.writeExpr(value)
+				if j+1 < len(clause.Values) {
+					g.builder.WriteString(":\n")
+				} else {
+					g.builder.WriteString(": {\n")
+				}
+			}
+		}
 		g.indent++
-		for _, inner := range s.Statements {
+		for _, inner := range clause.Body {
 			g.writeStmt(inner)
+		}
+		if !clauseEndsWithoutBreak(clause.Body) {
+			g.writeIndent()
+			g.builder.WriteString("break;\n")
 		}
 		g.indent--
 		g.writeIndent()
 		g.builder.WriteString("}\n")
-	case *ast.FunctionDecl:
-		g.writeFunction(s)
+	}
+	g.indent--
+	g.writeIndent()
+	g.builder.WriteString("}\n")
+}
+
+func clauseEndsWithoutBreak(statements []ast.Stmt) bool {
+	if len(statements) == 0 {
+		return false
+	}
+	switch statements[len(statements)-1].(type) {
+	case *ast.ReturnStmt, *ast.BreakStmt, *ast.ContinueStmt, *ast.FallthroughStmt:
+		return true
+	default:
+		return false
 	}
 }
 
@@ -111,14 +252,9 @@ func (g *generator) writeFunction(fn *ast.FunctionDecl) {
 			g.writeExpr(param.Default)
 		}
 	}
-	g.builder.WriteString(") {\n")
-	g.indent++
-	for _, stmt := range fn.Body.Statements {
-		g.writeStmt(stmt)
-	}
-	g.indent--
-	g.writeIndent()
-	g.builder.WriteString("}\n")
+	g.builder.WriteString(") ")
+	g.writeBlock(fn.Body)
+	g.builder.WriteByte('\n')
 }
 
 func (g *generator) writeExpr(expr ast.Expr) {
@@ -127,6 +263,12 @@ func (g *generator) writeExpr(expr ast.Expr) {
 		g.builder.WriteString(e.Raw)
 	case *ast.StringLit:
 		g.builder.WriteString(quoteJS(e.Value))
+	case *ast.BoolLit:
+		if e.Value {
+			g.builder.WriteString("true")
+		} else {
+			g.builder.WriteString("false")
+		}
 	case *ast.NullLit:
 		g.builder.WriteString("null")
 	case *ast.Ident:
@@ -153,26 +295,75 @@ func (g *generator) writeExpr(expr ast.Expr) {
 		prec := precedence(e)
 		g.writeOperand(e.Left, prec, false)
 		g.builder.WriteByte(' ')
-		g.builder.WriteString(string(e.Op))
+		g.builder.WriteString(binaryOperator(e.Op))
 		g.builder.WriteByte(' ')
 		g.writeOperand(e.Right, prec, true)
+	case *ast.TypeTestExpr:
+		g.writeTypeTest(e)
 	case *ast.IndexExpr:
+		g.builder.WriteByte('(')
 		g.writeOperand(e.X, precPostfix, false)
 		g.builder.WriteByte('[')
 		g.writeExpr(e.Index)
-		g.builder.WriteByte(']')
+		g.builder.WriteString("] ?? null)")
 	case *ast.MemberExpr:
 		g.writeOperand(e.X, precPostfix, false)
 		g.builder.WriteByte('.')
 		g.builder.WriteString(e.Name)
 	case *ast.CallExpr:
-		g.builder.WriteString(e.Callee)
-		g.builder.WriteByte('(')
-		g.writeCallArgs(e)
-		g.builder.WriteByte(')')
+		g.writeCall(e)
 	case *ast.LambdaExpr:
 		g.writeLambda(e)
 	}
+}
+
+func binaryOperator(op token.Type) string {
+	switch op {
+	case token.Eq, token.StrictEq:
+		return "==="
+	case token.NotEq, token.StrictNe:
+		return "!=="
+	default:
+		return string(op)
+	}
+}
+
+func (g *generator) writeTypeTest(expr *ast.TypeTestExpr) {
+	if expr.Negate {
+		g.builder.WriteByte('!')
+	}
+	g.builder.WriteByte('(')
+	name := expr.Type.Name
+	switch {
+	case expr.Type.Function:
+		g.builder.WriteString("typeof ")
+		g.writeExpr(expr.X)
+		g.builder.WriteString(" === \"function\"")
+	case name == "Number" || name == "Int" || name == "String" || name == "Boolean":
+		g.builder.WriteString("typeof ")
+		g.writeExpr(expr.X)
+		g.builder.WriteString(" === \"")
+		if name == "Number" || name == "Int" {
+			g.builder.WriteString("number")
+		} else if name == "String" {
+			g.builder.WriteString("string")
+		} else {
+			g.builder.WriteString("boolean")
+		}
+		g.builder.WriteByte('"')
+	case name == "Array":
+		g.builder.WriteString("Array.isArray(")
+		g.writeExpr(expr.X)
+		g.builder.WriteByte(')')
+	case name == "Null":
+		g.writeExpr(expr.X)
+		g.builder.WriteString(" === null")
+	case name == "Any" || name == "Unknown":
+		g.builder.WriteString("true")
+	default:
+		g.builder.WriteString("false")
+	}
+	g.builder.WriteByte(')')
 }
 
 func (g *generator) writeLambda(lambda *ast.LambdaExpr) {
@@ -187,6 +378,20 @@ func (g *generator) writeLambda(lambda *ast.LambdaExpr) {
 	g.writeExpr(lambda.Body)
 }
 
+func (g *generator) writeCall(call *ast.CallExpr) {
+	switch call.Callee {
+	case "println":
+		g.builder.WriteString("console.log")
+	case "toString":
+		g.builder.WriteString("String")
+	default:
+		g.builder.WriteString(call.Callee)
+	}
+	g.builder.WriteByte('(')
+	g.writeCallArgs(call)
+	g.builder.WriteByte(')')
+}
+
 func (g *generator) writeCallArgs(call *ast.CallExpr) {
 	hasNamed := false
 	for _, arg := range call.Args {
@@ -195,7 +400,6 @@ func (g *generator) writeCallArgs(call *ast.CallExpr) {
 			break
 		}
 	}
-
 	fn, hasFunction := g.functions[call.Callee]
 	if !hasNamed || !hasFunction {
 		g.writeArgumentValues(call.Args)
@@ -212,7 +416,7 @@ func (g *generator) writeCallArgs(call *ast.CallExpr) {
 		}
 	}
 
-	paramIndex := make(map[string]int, len(fn.Params))
+	paramIndex := make(map[string]int)
 	last := len(positional) - 1
 	for i, param := range fn.Params {
 		paramIndex[param.Name] = i
@@ -235,7 +439,6 @@ func (g *generator) writeCallArgs(call *ast.CallExpr) {
 		}
 		g.writeExpr(value)
 	}
-
 	for i := 0; i <= last; i++ {
 		if i < len(positional) {
 			writeValue(positional[i].Value)
@@ -281,10 +484,22 @@ func (g *generator) writeIndent() {
 func precedence(expr ast.Expr) int {
 	switch e := expr.(type) {
 	case *ast.BinaryExpr:
-		if e.Op == token.Plus || e.Op == token.Minus {
+		switch e.Op {
+		case token.OrOr:
+			return precOr
+		case token.AndAnd:
+			return precAnd
+		case token.Eq, token.NotEq, token.StrictEq, token.StrictNe:
+			return precEquality
+		case token.Lt, token.LtEq, token.Gt, token.GtEq:
+			return precComparison
+		case token.Plus, token.Minus:
 			return precAdditive
+		default:
+			return precMultiplicative
 		}
-		return precMultiplicative
+	case *ast.TypeTestExpr:
+		return precComparison
 	case *ast.UnaryExpr:
 		return precUnary
 	case *ast.LambdaExpr:

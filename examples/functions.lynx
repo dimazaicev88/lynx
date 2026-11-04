@@ -1,0 +1,24 @@
+// Functions, defaults, nullable values, named arguments and variadics.
+fun formatName(name: String? = null, prefix: String = "Hello"): String? {
+  return name
+}
+
+const named = formatName(name = "Lynx", prefix = "Hi");
+const positional = formatName("Lynx");
+const empty = formatName();
+
+fun first(numbers: Number...): Number? {
+  return numbers[0]
+}
+
+const firstNumber = first(1, 2, 3, 4);
+
+fun answer(): Number {
+  return 42
+}
+
+fun noop() {
+  return
+}
+
+noop()

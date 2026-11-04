@@ -1,0 +1,20 @@
+// Anonymous functions, function types and closures.
+fun log(value: Number): Number {
+  return value
+}
+
+val sum = { x: Int, y: Int ->
+  x + y
+}
+
+const total = log(sum(1, 5))
+
+fun apply(f: (Number) -> Number, value: Number): Number {
+  return f(value)
+}
+
+const incremented = apply({ n: Number -> n + 1 }, 10)
+
+const outer = { x: Number -> { y: Number -> x + y } }
+const addOne = outer(1)
+const closure = addOne(41)

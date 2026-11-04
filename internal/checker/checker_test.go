@@ -43,7 +43,7 @@ func TestCheckValidPrograms(t *testing.T) {
 		},
 		{
 			name: "nested arrays",
-			src:  `const a = [[1, 2], [3, 4]]; const b = a[0][1];`,
+			src:  `const a = [[1, 2], [3, 4]]; const row = a[0]; if row != null { const b = row[1]; }`,
 		},
 		{
 			name: "string concatenation",
@@ -86,7 +86,7 @@ func TestCheckErrors(t *testing.T) {
 		{"assign to const", `const a = 1; a = 2;`, "cannot assign to constant"},
 		{"assign wrong type", `var a: Number = 1; a = "x";`, "cannot assign a value of type String"},
 		{"array annotation mismatch", `const a: Array = 1;`, "cannot assign a value of type Number"},
-		{"unknown type name", `const a: Boolean = 1;`, `unknown type "Boolean"`},
+		{"unknown type name", `const a: Foo = 1;`, `unknown type "Foo"`},
 		{"undefined variable", `const a = b;`, `undefined variable "b"`},
 		{"duplicate declaration", `var a = 1; var a = 2;`, `variable "a" is already declared`},
 		{"unknown is not concrete", `const x: Unknown = 1; const y: Number = x;`, "cannot assign a value of type Unknown"},
@@ -127,7 +127,7 @@ func TestCheckValidFunctions(t *testing.T) {
 		},
 		{
 			name: "variadic function",
-			src:  `fun sum(numbers: Number...): Number { return numbers[0] } const total: Number = sum(1, 2, 3, 4);`,
+			src:  `fun sum(numbers: Number...): Number? { return numbers[0] } const total: Number? = sum(1, 2, 3, 4);`,
 		},
 		{
 			name: "void function",
@@ -268,7 +268,7 @@ func TestCheckValidLambdas(t *testing.T) {
 		},
 		{
 			name: "array of lambdas",
-			src:  `const fs = [{ x: Number -> x }, { y: Number -> y }]; const f = fs[0]; const r = f(1);`,
+			src:  `const fs = [{ x: Number -> x }, { y: Number -> y }]; const f = fs[0]; if f != null { const r = f(1); }`,
 		},
 	}
 

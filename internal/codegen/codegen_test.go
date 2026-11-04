@@ -36,7 +36,7 @@ func TestGenerateStatements(t *testing.T) {
 		"const s = \"a\\n\\\"b\";\n" +
 		"const q = \"it's\";\n" +
 		"const arr = [1, 2, 3];\n" +
-		"const x = arr[0];\n" +
+		"const x = (arr[0] ?? null);\n" +
 		"const n = arr.length;\n"
 
 	if got := generate(t, src); got != want {
@@ -57,7 +57,7 @@ func TestGenerateParentheses(t *testing.T) {
 		"const c = 1 - (2 - 3);\n" +
 		"const d = 10 / (2 * 5);\n" +
 		"const e = -(-1);\n" +
-		"const f = (1 + 2)[0];\n"
+		"const f = ((1 + 2)[0] ?? null);\n"
 
 	if got := generate(t, src); got != want {
 		t.Errorf("Generate() =\n%s\nwant:\n%s", got, want)
@@ -89,7 +89,7 @@ func TestGenerateFunctions(t *testing.T) {
 		"example(\"test\", 10);\n" +
 		"example();\n" +
 		"function variadic(...numbers) {\n" +
-		"  return numbers[0];\n" +
+		"  return (numbers[0] ?? null);\n" +
 		"}\n" +
 		"variadic(1, 2, 3, 4);\n" +
 		"function noop() {\n" +

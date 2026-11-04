@@ -49,6 +49,18 @@ func (p *Parser) parseStatement() (ast.Stmt, error) {
 		return p.parseFunctionDecl()
 	case p.check(token.Return):
 		return p.parseReturn()
+	case p.check(token.If):
+		return p.parseIf()
+	case p.check(token.For):
+		return p.parseFor()
+	case p.check(token.Switch):
+		return p.parseSwitch()
+	case p.check(token.Break):
+		return p.parseSimpleControl(token.Break)
+	case p.check(token.Continue):
+		return p.parseSimpleControl(token.Continue)
+	case p.check(token.Fallthrough):
+		return p.parseSimpleControl(token.Fallthrough)
 	case p.check(token.LBrace):
 		return p.parseBlock()
 	case p.check(token.Ident) && p.peek().Type == token.Assign:
@@ -56,7 +68,7 @@ func (p *Parser) parseStatement() (ast.Stmt, error) {
 	case p.check(token.Ident) && p.peek().Type == token.LParen:
 		return p.parseExprStmt()
 	default:
-		return nil, p.errorAt(p.current(), "expected a declaration, assignment or call, found %s", describe(p.current()))
+		return nil, p.errorAt(p.current(), "expected a statement, found %s", describe(p.current()))
 	}
 }
 
@@ -212,6 +224,166 @@ func (p *Parser) parseReturn() (ast.Stmt, error) {
 	return &ast.ReturnStmt{Position: keyword.Pos, Value: value}, nil
 }
 
+func (p *Parser) parseIf() (ast.Stmt, error) {
+	keyword := p.advance()
+	cond, err := p.parseExpression()
+	if err != nil {
+		return nil, err
+	}
+	then, err := p.parseBlock()
+	if err != nil {
+		return nil, err
+	}
+
+	stmt := &ast.IfStmt{Position: keyword.Pos, Cond: cond, Then: then}
+	if p.match(token.Else) {
+		if p.check(token.If) {
+			stmt.Else, err = p.parseIf()
+		} else {
+			stmt.Else, err = p.parseBlock()
+		}
+		if err != nil {
+			return nil, err
+		}
+	}
+	return stmt, nil
+}
+
+func (p *Parser) parseFor() (ast.Stmt, error) {
+	keyword := p.advance()
+	stmt := &ast.ForStmt{Position: keyword.Pos}
+	if p.check(token.LBrace) {
+		body, err := p.parseBlock()
+		stmt.Body = body
+		return stmt, err
+	}
+
+	threePart := false
+	if p.check(token.Const) || p.check(token.Var) || (p.check(token.Ident) && p.peek().Type == token.Assign) {
+		var err error
+		stmt.Init, err = p.parseStatement()
+		if err != nil {
+			return nil, err
+		}
+		threePart = p.consumedSemicolon() || p.match(token.Semicolon)
+		if !threePart {
+			return nil, p.errorAt(p.current(), "expected ';' after for initializer")
+		}
+	} else if p.match(token.Semicolon) {
+		threePart = true
+	} else {
+		cond, err := p.parseExpression()
+		if err != nil {
+			return nil, err
+		}
+		stmt.Cond = cond
+		threePart = p.match(token.Semicolon)
+	}
+
+	if threePart {
+		if !p.check(token.Semicolon) {
+			cond, err := p.parseExpression()
+			if err != nil {
+				return nil, err
+			}
+			stmt.Cond = cond
+		}
+		if _, err := p.expect(token.Semicolon, "';' after for condition"); err != nil {
+			return nil, err
+		}
+		if !p.check(token.LBrace) {
+			var err error
+			switch {
+			case p.check(token.Ident) && p.peek().Type == token.Assign:
+				stmt.Post, err = p.parseAssign()
+			case p.check(token.Ident) && p.peek().Type == token.LParen:
+				stmt.Post, err = p.parseExprStmt()
+			default:
+				return nil, p.errorAt(p.current(), "expected assignment or call in for post statement")
+			}
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	body, err := p.parseBlock()
+	stmt.Body = body
+	return stmt, err
+}
+
+func (p *Parser) parseSwitch() (ast.Stmt, error) {
+	keyword := p.advance()
+	stmt := &ast.SwitchStmt{Position: keyword.Pos}
+	var err error
+	if !p.check(token.LBrace) {
+		stmt.Value, err = p.parseExpression()
+		if err != nil {
+			return nil, err
+		}
+	}
+	if _, err := p.expect(token.LBrace, "'{' after switch"); err != nil {
+		return nil, err
+	}
+
+	for !p.check(token.RBrace) {
+		if p.check(token.EOF) {
+			return nil, p.errorAt(keyword, "unterminated switch; expected '}'")
+		}
+		clause := &ast.SwitchCase{Position: p.current().Pos}
+		switch {
+		case p.match(token.Case):
+			for {
+				value, err := p.parseExpression()
+				if err != nil {
+					return nil, err
+				}
+				clause.Values = append(clause.Values, value)
+				if !p.match(token.Comma) {
+					break
+				}
+			}
+		case p.match(token.Default):
+			clause.IsDefault = true
+		default:
+			return nil, p.errorAt(p.current(), "expected case or default in switch")
+		}
+		if _, err := p.expect(token.Colon, "':' after switch clause"); err != nil {
+			return nil, err
+		}
+
+		for !p.check(token.Case) && !p.check(token.Default) && !p.check(token.RBrace) {
+			if p.check(token.EOF) {
+				return nil, p.errorAt(keyword, "unterminated switch; expected '}'")
+			}
+			if p.match(token.Semicolon) {
+				continue
+			}
+			inner, err := p.parseStatement()
+			if err != nil {
+				return nil, err
+			}
+			clause.Body = append(clause.Body, inner)
+		}
+		stmt.Cases = append(stmt.Cases, clause)
+	}
+	p.advance()
+	return stmt, nil
+}
+
+func (p *Parser) parseSimpleControl(typ token.Type) (ast.Stmt, error) {
+	keyword := p.advance()
+	p.match(token.Semicolon)
+	switch typ {
+	case token.Break:
+		return &ast.BreakStmt{Position: keyword.Pos}, nil
+	case token.Continue:
+		return &ast.ContinueStmt{Position: keyword.Pos}, nil
+	default:
+		return &ast.FallthroughStmt{Position: keyword.Pos}, nil
+	}
+}
+
 func (p *Parser) parseBlock() (*ast.BlockStmt, error) {
 	open, err := p.expect(token.LBrace, "'{'")
 	if err != nil {
@@ -232,7 +404,7 @@ func (p *Parser) parseBlock() (*ast.BlockStmt, error) {
 		}
 		block.Statements = append(block.Statements, stmt)
 	}
-	p.advance() // '}'
+	p.advance()
 
 	return block, nil
 }
@@ -248,14 +420,13 @@ func (p *Parser) parseExprStmt() (ast.Stmt, error) {
 
 func (p *Parser) parseAssign() (ast.Stmt, error) {
 	name := p.advance()
-	p.advance() // '='
+	p.advance()
 
 	value, err := p.parseExpression()
 	if err != nil {
 		return nil, err
 	}
 	p.match(token.Semicolon)
-
 	return &ast.AssignStmt{Position: name.Pos, Name: name.Literal, NamePos: name.Pos, Value: value}, nil
 }
 
@@ -268,12 +439,22 @@ func (p *Parser) parseType() (*ast.TypeExpr, error) {
 	if err != nil {
 		return nil, err
 	}
-	nullable := p.match(token.Question)
-	return &ast.TypeExpr{Position: name.Pos, Name: name.Literal, Nullable: nullable}, nil
+	typ := &ast.TypeExpr{Position: name.Pos, Name: name.Literal}
+	if p.match(token.Lt) {
+		typ.Elem, err = p.parseType()
+		if err != nil {
+			return nil, err
+		}
+		if _, err := p.expect(token.Gt, "'>' after array element type"); err != nil {
+			return nil, err
+		}
+	}
+	typ.Nullable = p.match(token.Question)
+	return typ, nil
 }
 
 func (p *Parser) parseFunctionType() (*ast.TypeExpr, error) {
-	open := p.advance() // '('
+	open := p.advance()
 
 	params := make([]*ast.TypeExpr, 0)
 	if !p.check(token.RParen) {
@@ -314,7 +495,86 @@ func (p *Parser) parseFunctionType() (*ast.TypeExpr, error) {
 }
 
 func (p *Parser) parseExpression() (ast.Expr, error) {
-	return p.parseAdditive()
+	return p.parseOr()
+}
+
+func (p *Parser) parseOr() (ast.Expr, error) {
+	left, err := p.parseAnd()
+	if err != nil {
+		return nil, err
+	}
+	for p.check(token.OrOr) {
+		op := p.advance()
+		right, err := p.parseAnd()
+		if err != nil {
+			return nil, err
+		}
+		left = &ast.BinaryExpr{Position: op.Pos, Op: op.Type, Left: left, Right: right}
+	}
+	return left, nil
+}
+
+func (p *Parser) parseAnd() (ast.Expr, error) {
+	left, err := p.parseEquality()
+	if err != nil {
+		return nil, err
+	}
+	for p.check(token.AndAnd) {
+		op := p.advance()
+		right, err := p.parseEquality()
+		if err != nil {
+			return nil, err
+		}
+		left = &ast.BinaryExpr{Position: op.Pos, Op: op.Type, Left: left, Right: right}
+	}
+	return left, nil
+}
+
+func (p *Parser) parseEquality() (ast.Expr, error) {
+	left, err := p.parseComparison()
+	if err != nil {
+		return nil, err
+	}
+	for p.check(token.Eq) || p.check(token.NotEq) || p.check(token.StrictEq) || p.check(token.StrictNe) {
+		op := p.advance()
+		right, err := p.parseComparison()
+		if err != nil {
+			return nil, err
+		}
+		left = &ast.BinaryExpr{Position: op.Pos, Op: op.Type, Left: left, Right: right}
+	}
+	return left, nil
+}
+
+func (p *Parser) parseComparison() (ast.Expr, error) {
+	left, err := p.parseAdditive()
+	if err != nil {
+		return nil, err
+	}
+	for {
+		if p.check(token.Is) || (p.check(token.Bang) && p.peek().Type == token.Is) {
+			op := p.advance()
+			negate := op.Type == token.Bang
+			if negate {
+				p.advance()
+			}
+			typ, err := p.parseType()
+			if err != nil {
+				return nil, err
+			}
+			left = &ast.TypeTestExpr{Position: op.Pos, X: left, Type: typ, Negate: negate}
+			continue
+		}
+		if !p.check(token.Lt) && !p.check(token.LtEq) && !p.check(token.Gt) && !p.check(token.GtEq) {
+			return left, nil
+		}
+		op := p.advance()
+		right, err := p.parseAdditive()
+		if err != nil {
+			return nil, err
+		}
+		left = &ast.BinaryExpr{Position: op.Pos, Op: op.Type, Left: left, Right: right}
+	}
 }
 
 func (p *Parser) parseAdditive() (ast.Expr, error) {
@@ -354,7 +614,7 @@ func (p *Parser) parseMultiplicative() (ast.Expr, error) {
 }
 
 func (p *Parser) parseUnary() (ast.Expr, error) {
-	if p.check(token.Plus) || p.check(token.Minus) {
+	if p.check(token.Plus) || p.check(token.Minus) || p.check(token.Bang) {
 		op := p.advance()
 		operand, err := p.parseUnary()
 		if err != nil {
@@ -423,7 +683,7 @@ func (p *Parser) parseCallArgs() ([]*ast.CallArg, error) {
 	for {
 		if p.check(token.Ident) && p.peek().Type == token.Assign {
 			name := p.advance()
-			p.advance() // '='
+			p.advance()
 			value, err := p.parseExpression()
 			if err != nil {
 				return nil, err
@@ -474,6 +734,9 @@ func (p *Parser) parsePrimary() (ast.Expr, error) {
 	case token.Null:
 		p.advance()
 		return &ast.NullLit{Position: tok.Pos}, nil
+	case token.True, token.False:
+		p.advance()
+		return &ast.BoolLit{Position: tok.Pos, Value: tok.Type == token.True}, nil
 	case token.Ident:
 		p.advance()
 		return &ast.Ident{Position: tok.Pos, Name: tok.Literal}, nil
@@ -497,7 +760,7 @@ func (p *Parser) parsePrimary() (ast.Expr, error) {
 }
 
 func (p *Parser) parseLambda() (ast.Expr, error) {
-	open := p.advance() // '{'
+	open := p.advance()
 
 	params := make([]*ast.Param, 0)
 	if !p.check(token.Arrow) {
@@ -605,6 +868,10 @@ func (p *Parser) match(typ token.Type) bool {
 	return true
 }
 
+func (p *Parser) consumedSemicolon() bool {
+	return p.pos > 0 && p.tokens[p.pos-1].Type == token.Semicolon
+}
+
 func (p *Parser) expect(typ token.Type, what string) (token.Token, error) {
 	if !p.check(typ) {
 		return token.Token{}, p.errorAt(p.current(), "expected %s, found %s", what, describe(p.current()))
@@ -626,7 +893,9 @@ func describe(tok token.Token) string {
 		return fmt.Sprintf("number %s", tok.Literal)
 	case token.String:
 		return "string literal"
-	case token.Const, token.Var, token.Fun, token.Return, token.Null:
+	case token.Const, token.Var, token.Fun, token.Return, token.Null,
+		token.True, token.False, token.If, token.Else, token.For, token.Break,
+		token.Continue, token.Switch, token.Case, token.Default, token.Fallthrough, token.Is:
 		return fmt.Sprintf("keyword %q", tok.Literal)
 	default:
 		return fmt.Sprintf("%q", tok.Literal)

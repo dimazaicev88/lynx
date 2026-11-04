@@ -306,7 +306,7 @@ func TestParseErrors(t *testing.T) {
 		{"missing expression", `const a = ;`, "expected expression"},
 		{"missing bracket", `const a = [1, 2;`, "expected ']'"},
 		{"missing paren", `const a = (1;`, "expected ')'"},
-		{"bare expression", `1 + 2;`, "expected a declaration, assignment or call"},
+		{"bare expression", `1 + 2;`, "expected a statement"},
 	}
 
 	for _, tt := range tests {

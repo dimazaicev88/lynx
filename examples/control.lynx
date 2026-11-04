@@ -1,0 +1,37 @@
+// Conditions, loops, switch, generic arrays and type narrowing.
+fun classify(value: Number?): String {
+  if value == null {
+    return "null"
+  } else if value > 0 {
+    return "positive"
+  } else {
+    return "non-positive"
+  }
+}
+
+fun describe(value: Unknown): String {
+  if value is String {
+    return "string: " + value
+  }
+  return "not a string"
+}
+
+val values: Array<Number> = [10, 20, 30]
+for var i = 0; i < values.length; i = i + 1 {
+  val value = values[i]
+  if value == null {
+    continue
+  }
+
+  switch value {
+  case 10:
+    println("ten")
+  case 20, 30:
+    println("twenty or thirty")
+  default:
+    println("other")
+  }
+}
+
+println(classify(null))
+println(describe("Lynx"))

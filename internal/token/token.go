@@ -47,11 +47,23 @@ const (
 	LBrace    Type = "{"
 	RBrace    Type = "}"
 
-	Const  Type = "CONST"
-	Var    Type = "VAR"
-	Fun    Type = "FUN"
-	Return Type = "RETURN"
-	Null   Type = "NULL"
+	Const       Type = "CONST"
+	Var         Type = "VAR"
+	Fun         Type = "FUN"
+	Return      Type = "RETURN"
+	Null        Type = "NULL"
+	True        Type = "TRUE"
+	False       Type = "FALSE"
+	If          Type = "IF"
+	Else        Type = "ELSE"
+	For         Type = "FOR"
+	Break       Type = "BREAK"
+	Continue    Type = "CONTINUE"
+	Switch      Type = "SWITCH"
+	Case        Type = "CASE"
+	Default     Type = "DEFAULT"
+	Fallthrough Type = "FALLTHROUGH"
+	Is          Type = "IS"
 )
 
 // Position is a source location. Lines and columns are 1-based.
@@ -89,6 +101,30 @@ func Lookup(ident string) Type {
 		return Return
 	case "null":
 		return Null
+	case "true":
+		return True
+	case "false":
+		return False
+	case "if":
+		return If
+	case "else":
+		return Else
+	case "for":
+		return For
+	case "break":
+		return Break
+	case "continue":
+		return Continue
+	case "switch":
+		return Switch
+	case "case":
+		return Case
+	case "default":
+		return Default
+	case "fallthrough":
+		return Fallthrough
+	case "is":
+		return Is
 	default:
 		return Ident
 	}
