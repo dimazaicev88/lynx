@@ -1,0 +1,5 @@
+interface EventTarget {
+   function addEventListener(type: String, callback: EventListenerOrEventListenerObject?, options: AddEventListenerOptions? = null )
+   function dispatchEvent(event: Event): Boolean;
+   function removeEventListener(type: String, callback: EventListenerOrEventListenerObject?, options: EventListenerOptions? = null): void;
+}
